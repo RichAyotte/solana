@@ -72,11 +72,10 @@ impl std::fmt::Debug for Program {
 
 // given operating_mode and epoch, return the entire set of enabled programs
 fn get_programs(operating_mode: OperatingMode) -> Vec<(Program, Epoch)> {
-    let mut programs = vec![];
-
     match operating_mode {
-        OperatingMode::Development => {
+        OperatingMode::Development => vec![
             // Programs used for testing
+<<<<<<< HEAD
             programs.extend(
                 vec![
                     Program::BuiltinLoader(solana_bpf_loader_program!()),
@@ -127,8 +126,39 @@ fn get_programs(operating_mode: OperatingMode) -> Vec<(Program, Epoch)> {
             );
         }
     };
+=======
+            Program::BuiltinLoader(solana_bpf_loader_program!()),
+            Program::BuiltinLoader(solana_bpf_loader_deprecated_program!()),
+            Program::Native(solana_vest_program!()),
+            Program::Native(solana_budget_program!()),
+            Program::Native(solana_exchange_program!()),
+        ]
+        .into_iter()
+        .map(|program| (program, 0))
+        .collect::<Vec<_>>(),
 
-    programs
+        OperatingMode::Preview => vec![
+            (
+                Program::BuiltinLoader(solana_bpf_loader_deprecated_program!()),
+                0,
+            ),
+            (Program::BuiltinLoader(solana_bpf_loader_program!()), 89),
+        ],
+>>>>>>> f385af25e... Simplify get_programs(), specify a real Preview activation epoch for new BPFLoader
+
+        OperatingMode::Stable => vec![
+            (
+                Program::BuiltinLoader(solana_bpf_loader_deprecated_program!()),
+                34,
+            ),
+            (
+                Program::BuiltinLoader(solana_bpf_loader_program!()),
+                // The epoch of std::u64::MAX is a placeholder and is expected
+                // to be reduced in a future cluster update.
+                Epoch::MAX,
+            ),
+        ],
+    }
 }
 
 pub fn get_native_programs_for_genesis(operating_mode: OperatingMode) -> Vec<(String, Pubkey)> {
